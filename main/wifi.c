@@ -68,9 +68,9 @@ esp_err_t a_network_connect(void) {
   ESP_ERROR_CHECK(esp_wifi_start());
 
   conn_retry_num = 0;
+  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &wifi_handle_connect, wifi_interface));
   ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &wifi_handle_disconnect, NULL));
   ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_handle_got_ip, NULL));
-  ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &wifi_handle_connect, wifi_interface));
 
   ESP_LOGI(TAG, "Connecting to %s...", wifi_config.sta.ssid);
   ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wifi_config));
@@ -93,9 +93,9 @@ esp_err_t a_network_disconnect(void) {
 }
 
 static void wifi_shutdown(void) {
+  ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &wifi_handle_connect));
   ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &wifi_handle_disconnect));
   ESP_ERROR_CHECK(esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_handle_got_ip));
-  ESP_ERROR_CHECK(esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_CONNECTED, &wifi_handle_connect));
 
   esp_wifi_disconnect();
 
