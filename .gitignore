@@ -1,5 +1,6 @@
 /build/
 /local/
+/managed_components/
 
 secrets.h
 
