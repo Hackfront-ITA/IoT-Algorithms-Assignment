@@ -49,7 +49,7 @@ esp_err_t a_fft_set_size(size_t size) {
 		free(window);
 	}
 
-	buffer = malloc(fft_size * sizeof(float));
+	buffer = malloc(fft_size * 2 * sizeof(float));
 	if (buffer == NULL) {
 		ESP_LOGE(TAG, "malloc buffer");
 		return ESP_FAIL;
