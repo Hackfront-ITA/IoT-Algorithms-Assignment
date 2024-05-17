@@ -5,11 +5,11 @@ idf_component_register(
 		"fft.c"
 		"main.c"
 		"utils.c"
+		"mqtt.c"
 		"wifi.c"
 	INCLUDE_DIRS
 		"."
 	PRIV_REQUIRES
-		driver
 		esp_adc
 		esp-dsp
 		esp_netif

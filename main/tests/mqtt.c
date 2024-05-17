@@ -27,12 +27,16 @@
 
 #define TAG  "mqtt_example"
 
-extern const uint8_t a_mqtt_cert[]   asm("_binary_res_mqtt_cert_pem_start");
+extern const uint8_t a_mqtt_cert[]   asm("_binary_mqtt_cert_pem_start");
 
-static esp_mqtt_client_config_t mqtt_cfg = {
-  .broker.address.uri = MQTT_BROKER_URL,
-  .verification.certificate = (const char *)(a_mqtt_cert)
+static esp_mqtt_client_config_t a_mqtt_cfg = {
+  .broker = {
+    .address.uri = MQTT_BROKER_URL,
+    .verification.certificate = (const char *)(a_mqtt_cert)
+  }
 };
+
+esp_mqtt_client_handle_t a_client;
 
 static esp_err_t a_mqtt_app_start(void);
 
@@ -44,7 +48,7 @@ static void a_mqtt_on_publish(void *handler_args, esp_event_base_t base, int32_t
 static void a_mqtt_on_data(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 static void a_mqtt_on_error(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data);
 
-void a_mqtt_main(void) {
+void app_main(void) {
   ESP_LOGI(TAG, "[APP] Startup..");
   ESP_LOGI(TAG, "[APP] Free memory: %" PRIu32 " bytes", esp_get_free_heap_size());
   ESP_LOGI(TAG, "[APP] IDF version: %s", esp_get_idf_version());
@@ -66,8 +70,8 @@ void a_mqtt_main(void) {
 }
 
 static esp_err_t a_mqtt_app_start(void) {
-  esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-  if (client == NULL) {
+  a_client = esp_mqtt_client_init(&a_mqtt_cfg);
+  if (a_client == NULL) {
     return ESP_FAIL;
   }
   esp_mqtt_client_register_event(client, MQTT_EVENT_CONNECTED,    a_mqtt_on_connect,     NULL);
