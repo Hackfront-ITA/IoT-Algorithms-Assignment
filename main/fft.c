@@ -11,7 +11,6 @@
 
 static const char *TAG = "a_fft";
 
-// static SemaphoreHandle_t buf_sem;
 static size_t fft_size = 0;
 static float *window = NULL;
 static float *buffer = NULL;
@@ -24,21 +23,10 @@ esp_err_t a_fft_init(void) {
 		return result;
 	}
 
-	// buf_sem = xSemaphoreCreateBinary();
-	// if (buf_sem == NULL) {
-	// 	ESP_LOGE(TAG, "Cannot create semaphore buf_sem");
-	// 	return ESP_FAIL;
-	// }
-
 	return ESP_OK;
 }
 
 esp_err_t a_fft_set_size(size_t size) {
-	// if (!xSemaphoreTake(buf_sem, C_DELAY_MS(1000))) {
-	// 	ESP_LOGE(TAG, "Cannot take FFT buffer lock");
-	// 	return ESP_FAIL;
-	// }
-
 	fft_size = size;
 
 	if (buffer != NULL) {
@@ -49,44 +37,22 @@ esp_err_t a_fft_set_size(size_t size) {
 		free(window);
 	}
 
-	buffer = malloc(fft_size * sizeof(float));
+	buffer = calloc(fft_size * 2, sizeof(float));
 	if (buffer == NULL) {
 		ESP_LOGE(TAG, "malloc buffer");
 		return ESP_FAIL;
 	}
 
-	// xSemaphoreGive(buf_sem);
-
-	window = malloc(fft_size * sizeof(float));
+	window = calloc(fft_size, sizeof(float));
 	if (window == NULL) {
 		ESP_LOGE(TAG, "malloc window");
 		return ESP_FAIL;
 	}
 
-	dsps_wind_hann_f32(window, fft_size);
+	dsps_wind_blackman_f32(window, fft_size);
 
 	return ESP_OK;
 }
-
-// esp_err_t a_fft_prepare(float *input) {
-//   if (buffer == NULL || window == NULL) {
-//     return ESP_FAIL;
-//   }
-//
-//   if (!xSemaphoreTake(buf_sem, C_DELAY_MS(1000))) {
-//     ESP_LOGE(TAG, "Cannot take FFT buffer lock");
-//     return ESP_FAIL;
-//   }
-//
-//   for (int i = 0 ; i < fft_size; i++) {
-//     buffer[i * 2 + 0] = input[i] * window[i];  // Re([i])
-//     buffer[i * 2 + 1] = 0;  // Im([i])
-//   }
-//
-//   xSemaphoreGive(buf_sem);
-//
-//   return ESP_OK;
-// }
 
 esp_err_t a_fft_execute(float *input, float *output) {
 	esp_err_t result;
@@ -95,11 +61,6 @@ esp_err_t a_fft_execute(float *input, float *output) {
 		ESP_LOGE(TAG, "FFT not initialized yet");
 		return ESP_FAIL;
 	}
-
-	// if (!xSemaphoreTake(buf_sem, C_DELAY_MS(1000))) {
-	// 	ESP_LOGE(TAG, "Cannot take FFT buffer lock");
-	// 	return ESP_FAIL;
-	// }
 
 	for (int i = 0 ; i < fft_size; i++) {
 		buffer[i * 2 + 0] = input[i] * window[i];  // Re([i])
@@ -131,7 +92,17 @@ esp_err_t a_fft_execute(float *input, float *output) {
 		output[i] = C_LIN_TO_DB(norm);
 	}
 
-	// xSemaphoreGive(buf_sem);
+	return ESP_OK;
+}
+
+esp_err_t a_fft_destroy(void) {
+	if (buffer != NULL) {
+		free(buffer);
+	}
+
+	if (window != NULL) {
+		free(window);
+	}
 
 	return ESP_OK;
 }

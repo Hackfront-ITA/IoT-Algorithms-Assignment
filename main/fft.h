@@ -9,5 +9,6 @@ esp_err_t a_fft_init(void);
 esp_err_t a_fft_set_size(size_t size);
 // esp_err_t a_fft_prepare(float *input);
 esp_err_t a_fft_execute(float *input, float *output);
+esp_err_t a_fft_destroy(void);
 
 #endif /* end of include guard: A_FFT_H */

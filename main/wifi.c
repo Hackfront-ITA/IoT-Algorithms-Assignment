@@ -54,6 +54,8 @@ esp_err_t a_network_connect(void) {
 
 	ESP_LOGI(TAG, "Start hfex_connect.");
 
+	ESP_ERROR_CHECK(esp_netif_init());
+
 	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
 	ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 

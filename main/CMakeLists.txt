@@ -1,7 +1,7 @@
 idf_component_register(
 	SRCS
-		"tasks/adc.c"
-		"tasks/data_process.c"
+		"adapt.c"
+		"adc.c"
 		"fft.c"
 		"main.c"
 		"utils.c"
