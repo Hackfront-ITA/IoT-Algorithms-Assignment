@@ -63,7 +63,11 @@ float sense_sampling_freq(void) {
 	}
 
 	float sampling_freq = floor(A_ADAPT_SAMPLING_FREQ * factor * A_ADAPT_TOLERANCE);
-	ESP_LOGI(TAG, "new sampling frequency: %.02f Hz", sampling_freq);
+	ESP_LOGI(TAG, "sensed sampling frequency: %.02f Hz", sampling_freq);
+
+	sampling_freq = fmax(sampling_freq, SOC_ADC_SAMPLE_FREQ_THRES_LOW);
+	sampling_freq = fmin(sampling_freq, SOC_ADC_SAMPLE_FREQ_THRES_HIGH);
+	ESP_LOGI(TAG, "actual ADC sampling frequency: %.02f Hz", sampling_freq);
 
 	free(adc_data);
 	free(fft_data);
