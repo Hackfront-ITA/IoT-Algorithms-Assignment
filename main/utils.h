@@ -13,5 +13,6 @@
 
 float calc_powersave_factor(float *data, size_t len, float threshold);
 float calc_average(float *data, size_t len);
+void remove_dc_offset(float *data, size_t len);
 
 #endif /* end of include guard: N_UTILS_H */

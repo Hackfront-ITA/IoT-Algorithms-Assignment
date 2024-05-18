@@ -42,6 +42,8 @@ float sense_sampling_freq(void) {
 	ESP_ERROR_CHECK(a_adc_collect_samples(adc_data, A_ADAPT_NUM_SAMPLES, A_ADAPT_FLUSH_FREQ));
 	ESP_ERROR_CHECK(a_adc_stop());
 
+	remove_dc_offset(adc_data, A_ADAPT_NUM_SAMPLES);
+
 	ESP_LOGI(TAG, "*** View ADC data ***");
 	if (esp_log_level_get(TAG) == ESP_LOG_INFO) {
 		dsps_view(adc_data, 128, 128, 10, -50, +50, '@');
