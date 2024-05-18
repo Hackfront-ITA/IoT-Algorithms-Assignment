@@ -35,6 +35,7 @@
 
 static const char *TAG = "ADC module";
 
+static volatile uint32_t overflow_count = 0;
 static uint8_t a_result[A_ADC_READ_LEN];
 
 static adc_continuous_handle_t a_handle = NULL;
@@ -68,6 +69,8 @@ static bool IRAM_ATTR a_conv_done_cb(adc_continuous_handle_t handle,
 static bool IRAM_ATTR a_pool_ovf_cb(adc_continuous_handle_t handle,
     const adc_continuous_evt_data_t *edata, void *user_data)
 {
+	overflow_count++;
+
   return true;
 }
 
@@ -160,6 +163,9 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length,
 
     vTaskDelay(waiting_time);
 	}
+
+	ESP_LOGI(TAG, "overflow_count = %lu", overflow_count);
+	overflow_count = 0;
 
   return ESP_OK;
 }
