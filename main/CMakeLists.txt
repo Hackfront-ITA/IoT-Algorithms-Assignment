@@ -1,16 +1,18 @@
 idf_component_register(
 	SRCS
+		"tasks/data_process.c"
+		"tasks/data_read.c"
 		"adapt.c"
 		"adc.c"
 		"fft.c"
 		"main.c"
-		"utils.c"
 		"mqtt.c"
+		"utils.c"
 		"wifi.c"
 	INCLUDE_DIRS
 		"."
 	PRIV_REQUIRES
-		esp_adc
+		driver
 		esp-dsp
 		esp_netif
 		esp_wifi

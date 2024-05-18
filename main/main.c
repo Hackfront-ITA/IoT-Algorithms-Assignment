@@ -9,6 +9,7 @@
 #include <esp_log.h>
 #include <nvs_flash.h>
 
+#include "tasks/tasks.h"
 #include "adapt.h"
 #include "adc.h"
 #include "fft.h"
@@ -18,7 +19,14 @@
 
 #define A_DURATION  1000
 
+#define A_TASK_STACK_SIZE  1024
+
+TaskHandle_t th_data_read = NULL;
+TaskHandle_t th_data_process = NULL;
+
 static const char *TAG = "App main";
+
+static task_args_t task_args;
 
 void app_main(void) {
 	ESP_LOGI(TAG, "App start");
@@ -39,14 +47,10 @@ void app_main(void) {
 	sampling_freq = 1000;
 
 	float max_freq = sampling_freq / 2.0;
-	float flush_freq = sampling_freq * 1.2;
 	size_t num_samples = A_DURATION * sampling_freq / 1000.0;
 
 	ESP_LOGI(TAG, "new max frequency = %f", max_freq);
-	ESP_LOGI(TAG, "ADC buffer flush frequency = %f", flush_freq);
 	ESP_LOGI(TAG, "new num_samples = %d", num_samples);
-
-	ESP_ERROR_CHECK(a_adc_set_sampling_freq(sampling_freq));
 
 	ESP_LOGI(TAG, "calloc(%d, %d)", 4 * num_samples, sizeof(float));
 	float *adc_data = calloc(4 * num_samples, sizeof(float));
@@ -55,41 +59,23 @@ void app_main(void) {
 		return;
 	}
 
+	task_args.sampling_freq = sampling_freq;
+	task_args.num_samples = num_samples;
+	task_args.adc_data = adc_data;
+
+	ESP_LOGI(TAG, "Create data read task\n");
+	xTaskCreatePinnedToCore(task_data_read, "Data read task", A_TASK_STACK_SIZE, &task_args, 10, &th_data_read, 1);
+
+	ESP_LOGI(TAG, "Create data processing task\n");
+	xTaskCreate(task_data_process, "Data processing task", A_TASK_STACK_SIZE, &task_args, 10, &th_data_process);
+
 	// ESP_LOGI(TAG, "Connect to network");
 	// ESP_ERROR_CHECK(a_network_connect());
 	//
 	// ESP_LOGI(TAG, "Connect to MQTT server");
 	// ESP_ERROR_CHECK(a_mqtt_start());
 
-	ESP_LOGI(TAG, "Start sampling");
-	ESP_ERROR_CHECK(a_adc_start());
-
-	ESP_LOGI(TAG, "Running...");
-	while (1) {
-		ESP_ERROR_CHECK(a_adc_collect_samples(adc_data, num_samples, flush_freq));
-
-		ESP_LOGI(TAG, "*** View ADC data ***");
-		if (esp_log_level_get(TAG) == ESP_LOG_INFO) {
-			dsps_view(adc_data, num_samples, 128, 10, 0, +100, '@');
-		}
-
-		float average = calc_average(adc_data, num_samples);
-		ESP_LOGI(TAG, "average = %f", average);
-
-		// if (a_mqtt_connected) {
-		// 	ESP_LOGI(TAG, "Sending average");
-		//
-		// 	char buffer[16];
-		// 	snprintf(buffer, sizeof(buffer), "%.05f", average);
-		//
-		// 	ESP_ERROR_CHECK(a_mqtt_publish("/tests/esp32/average", buffer));
-		// }
-		//
-		// vTaskDelay(A_DURATION);
-	}
-
-	ESP_LOGI(TAG, "Stop sampling");
-	ESP_ERROR_CHECK(a_adc_stop());
+	// ESP_LOGI(TAG, "Running...");
 
 	// ESP_LOGI(TAG, "Disconnect from MQTT server");
 	// ESP_ERROR_CHECK(a_mqtt_stop());
@@ -97,7 +83,7 @@ void app_main(void) {
 	// ESP_LOGI(TAG, "Disconnect from network");
 	// ESP_ERROR_CHECK(a_network_disconnect());
 
-	free(adc_data);
+	// free(adc_data);
 
 	return;
 }

@@ -27,20 +27,16 @@ float sense_sampling_freq(void) {
 	float *adc_data = calloc(A_ADAPT_NUM_SAMPLES, sizeof(float));
 	if (adc_data == NULL) {
 		ESP_LOGE(TAG, "Error allocating adc_data (before adapt)");
-		return 0xffff;
+		return 0.0;
 	}
 
 	float *fft_data = calloc(A_ADAPT_NUM_SAMPLES / 2, sizeof(float));
 	if (fft_data == NULL) {
 		ESP_LOGE(TAG, "Error allocating fft_data");
-		return 0xffff;
+		return 0.0;
 	}
 
-	ESP_ERROR_CHECK(a_adc_set_sampling_freq(A_ADAPT_SAMPLING_FREQ));
-
-	ESP_ERROR_CHECK(a_adc_start());
-	ESP_ERROR_CHECK(a_adc_collect_samples(adc_data, A_ADAPT_NUM_SAMPLES, A_ADAPT_FLUSH_FREQ));
-	ESP_ERROR_CHECK(a_adc_stop());
+	a_adc_collect_samples(adc_data, A_ADAPT_NUM_SAMPLES, A_ADAPT_SAMPLING_FREQ);
 
 	ESP_LOGI(TAG, "*** View ADC data ***");
 	if (esp_log_level_get(TAG) == ESP_LOG_INFO) {
@@ -57,7 +53,7 @@ float sense_sampling_freq(void) {
 	float factor = calc_powersave_factor(fft_data, A_ADAPT_NUM_SAMPLES / 2, A_FFT_THRESHOLD);
 	ESP_LOGI(TAG, "factor = %f", factor);
 	if (factor < 0.01) {
-		return 0xffff;
+		return 0.0;
 	}
 
 	float sampling_freq = floor(A_ADAPT_SAMPLING_FREQ * factor * A_ADAPT_TOLERANCE);
