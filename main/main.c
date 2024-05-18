@@ -36,8 +36,6 @@ void app_main(void) {
 		return;
 	}
 
-	sampling_freq = 1000;
-
 	float max_freq = sampling_freq / 2.0;
 	float flush_freq = sampling_freq * 1.2;
 	size_t num_samples = A_DURATION * sampling_freq / 1000.0;
@@ -48,8 +46,8 @@ void app_main(void) {
 
 	ESP_ERROR_CHECK(a_adc_set_sampling_freq(sampling_freq));
 
-	ESP_LOGI(TAG, "calloc(%d, %d)", 4 * num_samples, sizeof(float));
-	float *adc_data = calloc(4 * num_samples, sizeof(float));
+	ESP_LOGI(TAG, "calloc(%d, %d)", num_samples, sizeof(float));
+	float *adc_data = calloc(num_samples, sizeof(float));
 	if (adc_data == NULL) {
 		ESP_LOGE(TAG, "Error allocating adc_data (after adapt)");
 		return;

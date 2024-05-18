@@ -49,7 +49,7 @@ esp_err_t a_fft_set_size(size_t size) {
 		return ESP_FAIL;
 	}
 
-	dsps_wind_blackman_f32(window, fft_size);
+	dsps_wind_hann_f32(window, fft_size);
 
 	return ESP_OK;
 }
