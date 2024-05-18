@@ -12,8 +12,8 @@
 #include "utils.h"
 
 #define A_ADAPT_NUM_SAMPLES      8192
-#define A_ADAPT_SAMPLING_FREQ    (10 * 1000)
-#define A_ADAPT_FLUSH_FREQ       (A_ADAPT_SAMPLING_FREQ * 3)
+#define A_ADAPT_SAMPLING_FREQ    (20000)
+#define A_ADAPT_FLUSH_FREQ       (A_ADAPT_SAMPLING_FREQ * 1.2)
 #define A_ADAPT_TOLERANCE        1.03
 
 #define A_FFT_THRESHOLD   20

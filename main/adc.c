@@ -21,7 +21,7 @@
 #define A_ADC_READ_TIMEOUT   100
 #define A_ADC_BUF_SIZE       2048
 
-#define A_ADC_READ_LEN       256
+#define A_ADC_READ_LEN       1024
 
 #if CONFIG_IDF_TARGET_ESP32 || CONFIG_IDF_TARGET_ESP32S2
   #define A_ADC_OUTPUT_TYPE             ADC_DIGI_OUTPUT_FORMAT_TYPE1
@@ -122,15 +122,14 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length,
     float flush_freq)
 {
   size_t index = 0;
-  uint16_t waiting_time = floor(A_ADC_READ_LEN * 1000.0 / flush_freq);
+  uint16_t waiting_time = floor((A_ADC_READ_LEN / 4) * 1000.0 / flush_freq);
   waiting_time = C_MAX(waiting_time, 1);
   ESP_LOGI(TAG, "waiting_time = %hu", waiting_time);
 
-	while (length > index) {
-    uint32_t psize = C_MAX(length - index, A_ADC_READ_LEN);
+	while (index < length) {
 		uint32_t rsize = 0;
 
-		esp_err_t err = adc_continuous_read(a_handle, a_result, psize,
+		esp_err_t err = adc_continuous_read(a_handle, a_result, A_ADC_READ_LEN,
       &rsize, A_ADC_READ_TIMEOUT);
 
 		if (err == ESP_ERR_TIMEOUT) {

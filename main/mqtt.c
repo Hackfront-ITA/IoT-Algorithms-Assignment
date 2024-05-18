@@ -5,14 +5,20 @@
 
 #include "config.h"
 
-static const char *TAG = "MQTT";
+bool a_mqtt_connected = false;
 
 extern const uint8_t a_mqtt_cert[]   asm("_binary_mqtt_cert_pem_start");
+
+static const char *TAG = "MQTT";
 
 static esp_mqtt_client_config_t a_mqtt_cfg = {
   .broker = {
     .address.uri = MQTT_BROKER_URL,
-    .verification.certificate = (const char *)(a_mqtt_cert)
+    .verification = {
+			.certificate = (const char *)(a_mqtt_cert),
+			.skip_cert_common_name_check = true,
+			// .common_name = "MQTT Server",
+		}
   }
 };
 
@@ -56,12 +62,16 @@ esp_err_t a_mqtt_publish(const char *topic, const char *data) {
 static void a_mqtt_on_connect(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
   ESP_LOGI(TAG, "Connected");
 
+	a_mqtt_connected = true;
+
   int msg_id = esp_mqtt_client_publish(a_client, "/tests/esp32/status", "ALIVE", 0, 0, true);
   ESP_LOGI(TAG, "Sent alive message, msg_id=%d", msg_id);
 };
 
 static void a_mqtt_on_disconnect(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {
   ESP_LOGI(TAG, "Disconnected");
+
+	a_mqtt_connected = false;
 };
 
 static void a_mqtt_on_error(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data) {

@@ -3,6 +3,8 @@
 
 #include <esp_err.h>
 
+extern bool a_mqtt_connected;
+
 esp_err_t a_mqtt_start(void);
 esp_err_t a_mqtt_stop(void);
 esp_err_t a_mqtt_publish(const char *topic, const char *data);

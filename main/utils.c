@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include <esp_log.h>
+#include <esp_tls.h>
 
 static const char *TAG = "Utils";
 
@@ -31,4 +32,14 @@ float calc_average(float *data, size_t len) {
 	average /= len;
 
 	return average;
+}
+
+void print_ciphers(void) {
+	const int *clist = esp_tls_get_ciphersuites_list();
+
+	int i = 0;
+	while (clist[i] != 0) {
+		printf("clist[%02d] = %04x\n", i, clist[i]);
+		i++;
+	}
 }
