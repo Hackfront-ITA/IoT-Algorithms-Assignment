@@ -2,6 +2,6 @@
 /local/
 /managed_components/
 
-secrets.h
+config.h
 
 *.old
