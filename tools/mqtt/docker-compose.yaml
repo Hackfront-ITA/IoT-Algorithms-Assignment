@@ -1,0 +1,16 @@
+name: iot-assignment
+
+services:
+  mosquitto:
+    image: eclipse-mosquitto
+    network_mode: host
+    ports:
+      - 1883:1883/tcp
+    read_only: true
+    user: 1000:1000
+    volumes:
+      - ./config:/mosquitto/config
+
+networks:
+  default:
+    driver: none
