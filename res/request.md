@@ -1,7 +1,7 @@
 The goal of the assignment is to create an IoT system that collects information from a sensor, analyses the data locally and communicates to a nearby server an aggregated value of the sensor readings. The IoT system adapts the sampling frequency in order to save energy and reduce communication overhead. The IoT device will be based on an ESP32 prototype board and the firmware will be developed using the FreeRTOS. You are free to use IoT-Lab or real devices.
 
-Input: Assume an input signal of the form of SUM(a_k*sin(f_k)).
-For example: 2*sin(2*pi*3*t)+4*sin(2*pi*5*t)
+Input: Assume an input signal of the form of `SUM(a_k*sin(f_k))`.
+For example: `2*sin(2*pi*3*t)+4*sin(2*pi*5*t)`
 
 Maximum sampling frequency: Identify the maximum sampling frequency of your hardware device, for example, 100Hz. Note 100Hz is only an example. You need to demonstrate the ability of sampling at a very high frequency.
 
