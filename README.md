@@ -1,11 +1,9 @@
 # IoT Algorithms and Services - Assignment
 Individual assignment for IoT Algorithms and Services course
 
-
 ## Contents
 
 - [Description](#description)
-- [Request](#request)
 - [Circuit](#circuit)
 - [Configuration](#configuration)
 - [Build](#build)
@@ -13,13 +11,19 @@ Individual assignment for IoT Algorithms and Services course
 
 ## Description
 
-High-level description
+The goal of the assignment is to create an IoT system that collects information from a sensor, analyses the data locally and communicates to a nearby server an aggregated value of the sensor readings. The IoT system adapts the sampling frequency in order to save energy and reduce communication overhead. The IoT device will be based on an ESP32 prototype board and the firmware will be developed using the FreeRTOS.
 
-## Request
-
-[Link](./res/request.md)
+[Full details](./res/request.md)
 
 ## Circuit
+
+This circuit is used to transform an audio signal, which is an analog signal centered around 0V, to a signal suitable for ADC input.
+
+The voltage divider adds a DC offset of around 1.65V to the signal, while the capacitor is a RC high-pass filter which blocks the DC component from returning to the sound card.
+
+In this way the signal is in the range 0V - 2.5V, which the ADC is capable to read.
+
+For the standard ESP32 the pin corresponding to ADC1 channel 4 is GPIO32, while for the ESP32-S3 is GPIOxx.
 
 ![Circuit](./res/circuit.png "Audio sampling circuit")
 
@@ -60,4 +64,4 @@ idf.py monitor
 
 ## Evaluation
 
-[Link](./res/evaluation.md)
+[Link to evaluation document](./res/evaluation.md)
