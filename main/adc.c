@@ -19,7 +19,7 @@
 #define A_ADC_MAX_VAL        4096
 
 #define A_ADC_READ_TIMEOUT   100
-#define A_ADC_BUF_SIZE       2048
+#define A_ADC_BUF_SIZE       4096
 
 #define A_ADC_READ_LEN       1024
 
@@ -35,6 +35,7 @@
 
 static const char *TAG = "ADC module";
 
+static volatile uint32_t overflow_count = 0;
 static uint8_t a_result[A_ADC_READ_LEN];
 
 static adc_continuous_handle_t a_handle = NULL;
@@ -68,6 +69,8 @@ static bool IRAM_ATTR a_conv_done_cb(adc_continuous_handle_t handle,
 static bool IRAM_ATTR a_pool_ovf_cb(adc_continuous_handle_t handle,
     const adc_continuous_evt_data_t *edata, void *user_data)
 {
+	overflow_count++;
+
   return true;
 }
 
@@ -118,9 +121,7 @@ esp_err_t a_adc_stop(void) {
   return adc_continuous_stop(a_handle);
 }
 
-esp_err_t a_adc_collect_samples(float *buffer, size_t length,
-    float flush_freq)
-{
+esp_err_t a_adc_collect_samples(float *buffer, size_t length, float flush_freq) {
   size_t index = 0;
   uint16_t waiting_time = floor((A_ADC_READ_LEN / 4) * 1000.0 / flush_freq);
   waiting_time = C_MAX(waiting_time, 1);
@@ -158,8 +159,11 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length,
 			}
 		}
 
-    vTaskDelay(waiting_time);
+    vTaskDelay(C_DELAY_MS(waiting_time));
 	}
+
+	ESP_LOGI(TAG, "overflow_count = %lu", overflow_count);
+	overflow_count = 0;
 
   return ESP_OK;
 }

@@ -43,3 +43,11 @@ void print_ciphers(void) {
 		i++;
 	}
 }
+
+void remove_dc_offset(float *data, size_t len) {
+	float average = calc_average(data, len);
+
+	for (size_t i = 0; i < len; i++) {
+		data[i] -= average;
+	}
+}
