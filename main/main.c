@@ -47,7 +47,7 @@ void app_main(void) {
 	ESP_ERROR_CHECK(a_adc_set_sampling_freq(sampling_freq));
 
 	ESP_LOGI(TAG, "calloc(%d, %d)", num_samples, sizeof(float));
-	float *adc_data = calloc(num_samples, sizeof(float));
+	float *adc_data = calloc(2 * num_samples, sizeof(float));
 	if (adc_data == NULL) {
 		ESP_LOGE(TAG, "Error allocating adc_data (after adapt)");
 		return;
@@ -71,6 +71,7 @@ void app_main(void) {
 			dsps_view(adc_data, num_samples, 128, 10, 0, +100, '@');
 		}
 
+		ESP_LOGI(TAG, "Calculating average");
 		float average = calc_average(adc_data, num_samples);
 		ESP_LOGI(TAG, "average = %f", average);
 

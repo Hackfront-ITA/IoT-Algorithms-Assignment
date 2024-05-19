@@ -18,7 +18,7 @@
 #define A_ADC_SAMPLING_FREQ  20000
 #define A_ADC_MAX_VAL        4096
 
-#define A_ADC_READ_TIMEOUT   100
+#define A_ADC_READ_TIMEOUT   1000
 #define A_ADC_BUF_SIZE       4096
 
 #define A_ADC_READ_LEN       1024
@@ -128,6 +128,8 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length, float flush_freq) 
   ESP_LOGI(TAG, "waiting_time = %hu", waiting_time);
 
 	while (index < length) {
+		vTaskDelay(C_DELAY_MS(waiting_time));
+
 		uint32_t rsize = 0;
 
 		esp_err_t err = adc_continuous_read(a_handle, a_result, A_ADC_READ_LEN,
@@ -158,8 +160,6 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length, float flush_freq) 
           channel, data);
 			}
 		}
-
-    vTaskDelay(C_DELAY_MS(waiting_time));
 	}
 
 	ESP_LOGI(TAG, "overflow_count = %lu", overflow_count);

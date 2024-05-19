@@ -11,12 +11,12 @@
 #include "fft.h"
 #include "utils.h"
 
-#define A_ADAPT_NUM_SAMPLES      8192
-#define A_ADAPT_SAMPLING_FREQ    (20 * 1000)
+#define A_ADAPT_NUM_SAMPLES      4096
+#define A_ADAPT_SAMPLING_FREQ    (5 * 1000)
 #define A_ADAPT_FLUSH_FREQ       (A_ADAPT_SAMPLING_FREQ * 1.2)
 #define A_ADAPT_TOLERANCE        1.03
 
-#define A_FFT_THRESHOLD   60
+#define A_FFT_THRESHOLD   50
 
 static const char *TAG = "Adapt";
 
@@ -24,13 +24,13 @@ float sense_sampling_freq(void) {
 	ESP_ERROR_CHECK(a_fft_init());
 	ESP_ERROR_CHECK(a_fft_set_size(A_ADAPT_NUM_SAMPLES));
 
-	float *adc_data = calloc(A_ADAPT_NUM_SAMPLES, sizeof(float));
+	float *adc_data = calloc(2 * A_ADAPT_NUM_SAMPLES, sizeof(float));
 	if (adc_data == NULL) {
 		ESP_LOGE(TAG, "Error allocating adc_data (before adapt)");
 		return 0.0;
 	}
 
-	float *fft_data = calloc(A_ADAPT_NUM_SAMPLES / 2, sizeof(float));
+	float *fft_data = calloc(2 * A_ADAPT_NUM_SAMPLES / 2, sizeof(float));
 	if (fft_data == NULL) {
 		ESP_LOGE(TAG, "Error allocating fft_data");
 		return 0.0;
@@ -46,7 +46,7 @@ float sense_sampling_freq(void) {
 
 	ESP_LOGI(TAG, "*** View ADC data ***");
 	if (esp_log_level_get(TAG) == ESP_LOG_INFO) {
-		dsps_view(adc_data, 128, 128, 10, -50, +50, '@');
+		dsps_view(adc_data, A_ADAPT_NUM_SAMPLES, 128, 10, -50, +50, '@');
 	}
 
 	ESP_ERROR_CHECK(a_fft_execute(adc_data, fft_data));

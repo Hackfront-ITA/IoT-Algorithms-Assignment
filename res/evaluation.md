@@ -2,8 +2,8 @@
 
 ## Contents
 
-- [Code parameters](#parameters)
+- [Code parameters](#code-parameters)
 
-### Code parameters {#parameters}
+### Code parameters
 
 TODO
