@@ -1,0 +1,6 @@
+[submodule "tools/measurement/lib/INA219"]
+	path = tools/measurement/lib/INA219
+	url = https://github.com/adafruit/Adafruit_INA219.git
+[submodule "tools/measurement/lib/BusIO"]
+	path = tools/measurement/lib/BusIO
+	url = https://github.com/adafruit/Adafruit_BusIO.git
