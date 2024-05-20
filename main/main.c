@@ -17,7 +17,7 @@
 #include "utils.h"
 
 #define A_DO_ADAPTATION        1
-#define A_START_SAMPLING_FREQ  (5 * 1000)
+#define A_START_SAMPLING_FREQ  (2 * 1000)
 #define A_WINDOW_LEN           1000
 
 static const char *TAG = "App main";
@@ -40,9 +40,10 @@ void app_main(void) {
 		ESP_LOGE(TAG, "Error executing sample rate adaptation");
 		return;
 	}
+	ESP_LOGW(TAG, "Sensed sampling frequency: %.02f Hz", sampling_freq);
 #else
 	sampling_freq = A_START_SAMPLING_FREQ;
-	ESP_LOGI(TAG, "Fixed sampling frequency: %d Hz", sampling_freq);
+	ESP_LOGW(TAG, "Fixed sampling frequency: %.02f Hz", sampling_freq);
 #endif
 
 	sampling_freq = fmax(sampling_freq, SOC_ADC_SAMPLE_FREQ_THRES_LOW);
@@ -67,11 +68,11 @@ void app_main(void) {
 		return;
 	}
 
-	// ESP_LOGI(TAG, "Connect to network");
-	// ESP_ERROR_CHECK(a_network_connect());
-	//
-	// ESP_LOGI(TAG, "Connect to MQTT server");
-	// ESP_ERROR_CHECK(a_mqtt_start());
+	ESP_LOGI(TAG, "Connect to network");
+	ESP_ERROR_CHECK(a_network_connect());
+
+	ESP_LOGI(TAG, "Connect to MQTT server");
+	ESP_ERROR_CHECK(a_mqtt_start());
 
 	ESP_LOGI(TAG, "Start sampling");
 	ESP_ERROR_CHECK(a_adc_start());
@@ -102,11 +103,11 @@ void app_main(void) {
 	ESP_LOGI(TAG, "Stop sampling");
 	ESP_ERROR_CHECK(a_adc_stop());
 
-	// ESP_LOGI(TAG, "Disconnect from MQTT server");
-	// ESP_ERROR_CHECK(a_mqtt_stop());
-	//
-	// ESP_LOGI(TAG, "Disconnect from network");
-	// ESP_ERROR_CHECK(a_network_disconnect());
+	ESP_LOGI(TAG, "Disconnect from MQTT server");
+	ESP_ERROR_CHECK(a_mqtt_stop());
+
+	ESP_LOGI(TAG, "Disconnect from network");
+	ESP_ERROR_CHECK(a_network_disconnect());
 
 	free(adc_data);
 

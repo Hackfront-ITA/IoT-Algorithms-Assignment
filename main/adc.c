@@ -127,6 +127,8 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length, float flush_freq) 
 	waiting_time = C_MAX(waiting_time, 1);
 	ESP_LOGI(TAG, "waiting_time = %hu", waiting_time);
 
+	uint16_t calls = 0;
+
 	while (index < length) {
 		vTaskDelay(C_DELAY_MS(waiting_time));
 
@@ -160,10 +162,14 @@ esp_err_t a_adc_collect_samples(float *buffer, size_t length, float flush_freq) 
 					channel, data);
 			}
 		}
+
+		calls++;
 	}
 
 	ESP_LOGI(TAG, "overflow_count = %lu", overflow_count);
 	overflow_count = 0;
+
+	ESP_LOGI(TAG, "adc_continuous_read calls: %hu", calls);
 
 	return ESP_OK;
 }

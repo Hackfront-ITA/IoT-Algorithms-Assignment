@@ -12,11 +12,11 @@
 #include "utils.h"
 
 #define A_ADAPT_NUM_SAMPLES      4096
-#define A_ADAPT_SAMPLING_FREQ    (5 * 1000)
+#define A_ADAPT_SAMPLING_FREQ    (2 * 1000)
 #define A_ADAPT_FLUSH_FREQ       (A_ADAPT_SAMPLING_FREQ * 1.2)
 #define A_ADAPT_TOLERANCE        1.03
 
-#define A_FFT_THRESHOLD   50
+#define A_FFT_THRESHOLD   55
 
 static const char *TAG = "Adapt";
 
@@ -63,7 +63,6 @@ float sense_sampling_freq(void) {
 	}
 
 	float sampling_freq = floor(A_ADAPT_SAMPLING_FREQ * factor * A_ADAPT_TOLERANCE);
-	ESP_LOGI(TAG, "sensed sampling frequency: %.02f Hz", sampling_freq);
 
 	free(adc_data);
 	free(fft_data);
