@@ -7,6 +7,7 @@ Individual assignment for IoT Algorithms and Services course
 - [Circuit](#circuit)
 - [Configuration](#configuration)
 - [Build](#build)
+- [Technical details](#technical-details)
 - [Evaluation](#evaluation)
 
 ## Description
@@ -61,6 +62,30 @@ To open a serial monitor:
 ```shell
 idf.py monitor
 ```
+
+## Technical details
+
+### ADC
+
+ADC is put in continuous mode, so the signal is periodically sampled and put in an internal buffer directly by the library, using timers to have an accurate sampling period.
+
+The samples are periodically collected by [`a_adc_collect_samples()`](./main/adc.c#L124) using a "buffer flush frequency", which is slightly higher (x1.2) than the sampling frequency to prevent buffer overflows.
+
+In that function, between each call of `adc_continuous_read()`, the task is put to sleep using `vTaskDelay()` for an amount of time defined by that frequency.
+
+Once the array is filled with the required number of samples, the function returns exactly after `num_samples / sampling_freq` seconds.
+
+### Sample rate adaptation
+
+To estimate optimal sampling frequency the program collects a fixed number of samples (ex. 8192) and computes an FFT.
+
+Finds the maximum frequency of the input signal by scanning the output of the FFT and findind the value (magnitude) with the maximum index (frequency) that is over a certain threshold.
+
+This threshold accounts for signal noise, so is measured by providing the ESP an empty signal and finding the maximum magnitude that appears in the FFT.
+
+To calculate the optimal sampling frequency, the maximum index of the array is divided by the array length to obtain an "adaptation factor" and multiplied by the original sampling frequency.
+
+This frequency is then checked and restricted against ADC upper and lower bounds.
 
 ## Evaluation
 
