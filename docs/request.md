@@ -19,8 +19,7 @@ Transmit the aggregate value, i.e. the average, to a nearby edge server using MQ
 
 ### Measure the performance of the system
 Evaluate the savings in energy of the new/adaptive sampling frequency against the original over sampled one.
-Measure
-the volume of data transmitted over the network when the new/adaptive sampling frequency is used against the original over sampled one.
+Measure the volume of data transmitted over the network when the new/adaptive sampling frequency is used against the original over sampled one.
 Measure the end-to-end latency of the system. From the point the data are generated up to the point they are received from the edge server.
 
 ## Bonus
