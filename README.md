@@ -14,7 +14,7 @@ Individual assignment for IoT Algorithms and Services course
 
 The goal of the assignment is to create an IoT system that collects information from a sensor, analyses the data locally and communicates to a nearby server an aggregated value of the sensor readings. The IoT system adapts the sampling frequency in order to save energy and reduce communication overhead. The IoT device will be based on an ESP32 prototype board and the firmware will be developed using the FreeRTOS.
 
-[Full details](./res/request.md)
+[Full details](./docs/request.md)
 
 ## Circuit
 
@@ -26,7 +26,7 @@ In this way the signal is in the range 0V - 2.5V, which the ADC is capable to re
 
 For the standard ESP32 the pin corresponding to ADC1 channel 4 is GPIO32, while for the ESP32-S3 is GPIOxx.
 
-![Circuit](./res/circuit.png "Audio sampling circuit")
+![Circuit](./res/audio_circuit.png "Audio sampling circuit")
 
 ## Configuration
 
@@ -77,9 +77,9 @@ Once the array is filled with the required number of samples, the function retur
 
 ### Sample rate adaptation
 
-To estimate optimal sampling frequency the program collects a fixed number of samples (ex. 8192) and computes an FFT.
+To estimate optimal sampling frequency the program collects a fixed number of samples (ex. 8192) with an hardcoded initial frequency and computes an FFT.
 
-Finds the maximum frequency of the input signal by scanning the output of the FFT and findind the value (magnitude) with the maximum index (frequency) that is over a certain threshold.
+Finds the maximum frequency of the input signal by scanning the output of the FFT and finding the maximum index (frequency) that has a value (magnitude) over a certain threshold.
 
 This threshold accounts for signal noise, so is measured by providing the ESP an empty signal and finding the maximum magnitude that appears in the FFT.
 
@@ -87,6 +87,6 @@ To calculate the optimal sampling frequency, the maximum index of the array is d
 
 This frequency is then checked and restricted against ADC upper and lower bounds.
 
-## Evaluation
+## Performance evaluation
 
-[Link to evaluation document](./res/evaluation.md)
+[Link to evaluation document](./docs/evaluation.md)
