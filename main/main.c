@@ -16,7 +16,9 @@
 #include "network.h"
 #include "utils.h"
 
-#define A_DURATION  1000
+#define A_DO_ADAPTATION        1
+#define A_START_SAMPLING_FREQ  (5 * 1000)
+#define A_WINDOW_LEN           1000
 
 static const char *TAG = "App main";
 
@@ -29,16 +31,28 @@ void app_main(void) {
 	ESP_LOGI(TAG, "Init ADC");
 	ESP_ERROR_CHECK(a_adc_init());
 
+	float sampling_freq;
+
+#if A_DO_ADAPTATION == 1
 	ESP_LOGI(TAG, "Sense sampling frequency");
-	float sampling_freq = sense_sampling_freq();
+	sampling_freq = sense_sampling_freq();
 	if (sampling_freq < 0.001) {
 		ESP_LOGE(TAG, "Error executing sample rate adaptation");
 		return;
 	}
+#else
+	sampling_freq = A_START_SAMPLING_FREQ;
+	ESP_LOGI(TAG, "Fixed sampling frequency: %d Hz", sampling_freq);
+#endif
+
+	sampling_freq = fmax(sampling_freq, SOC_ADC_SAMPLE_FREQ_THRES_LOW);
+	sampling_freq = fmin(sampling_freq, SOC_ADC_SAMPLE_FREQ_THRES_HIGH);
+	ESP_LOGI(TAG, "actual ADC sampling frequency: %.02f Hz", sampling_freq);
+
 
 	float max_freq = sampling_freq / 2.0;
 	float flush_freq = sampling_freq * 1.2;
-	size_t num_samples = A_DURATION * sampling_freq / 1000.0;
+	size_t num_samples = A_WINDOW_LEN * sampling_freq / 1000.0;
 
 	ESP_LOGI(TAG, "new max frequency = %f", max_freq);
 	ESP_LOGI(TAG, "ADC buffer flush frequency = %f", flush_freq);
@@ -75,16 +89,14 @@ void app_main(void) {
 		float average = calc_average(adc_data, num_samples);
 		ESP_LOGI(TAG, "average = %f", average);
 
-		// if (a_mqtt_connected) {
-		// 	ESP_LOGI(TAG, "Sending average");
-		//
-		// 	char buffer[16];
-		// 	snprintf(buffer, sizeof(buffer), "%.05f", average);
-		//
-		// 	ESP_ERROR_CHECK(a_mqtt_publish("/tests/esp32/average", buffer));
-		// }
-		//
-		// vTaskDelay(A_DURATION);
+		if (a_mqtt_connected) {
+			ESP_LOGI(TAG, "Sending average");
+
+			char buffer[16];
+			snprintf(buffer, sizeof(buffer), "%.05f", average);
+
+			ESP_ERROR_CHECK(a_mqtt_publish("/tests/esp32/average", buffer));
+		}
 	}
 
 	ESP_LOGI(TAG, "Stop sampling");
