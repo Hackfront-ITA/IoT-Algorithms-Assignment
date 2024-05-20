@@ -63,7 +63,19 @@ In conclusion, it seems that the power consumption varies a bit with the frequen
 
 ### Network traffic
 
-TODO
+To measure network traffic, Wireshark is used on the MQTT broker host.
+
+![MQTT traffic](../res/mqtt_traffic.png "MQTT traffic")
+
+There is an initial handshake to establish the MQTT with TLS connection, which takes 18 packets (3863 bytes in total), then every second an MQTT message is sent, which results in two packets of 115 and 54 bytes.
+
+As expected, the network traffic does not depend on the sampling frequency of the input signal, as the averaging window is fixed at 1 s.
+
+To obtain this, the number of samples to collect is calculated from the sampling rate and the window length which is a constant (1 s):
+
+```c
+size_t num_samples = A_WINDOW_LEN * sampling_freq / 1000.0;
+```
 
 ### End to end latency
 
