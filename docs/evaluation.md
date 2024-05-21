@@ -79,4 +79,42 @@ size_t num_samples = A_WINDOW_LEN * sampling_freq / 1000.0;
 
 ### End to end latency
 
-TODO
+The end-to-end latency is the time that passes between the start of signal generation and the reception through MQTT of the average value that takes it into account.
+
+It is measured with a Python script at [tools/latency_eval.py](../tools/latency_eval.py).
+
+This script:
+
+- Connects to the MQTT server, subscribing to the topic where the ESP32 sends the average
+- Waits for an average value to be used as a reference later
+- Starts time measurement
+- Starts signal generation and output through the sound card, which is the ESP32 input
+- Waits for another average value and compares that to the former. If this value is a bit higher, the signal was taken into account so the time measurement stops
+- After the signal duration (5 s), the time delta is printed in output as a measure of the latency
+
+By running the script a couple of times, the end-to-end latency varies between 1 and 2 seconds, which is expected, as the averaging window length is 1 s.
+
+**The worst case**
+
+At the time the signal is generated, the ADC could have just finished collecting samples for a window, so the program needs to compute the average, send the old average through MQTT, collect samples for a new window, compute the new average and send it through MQTT. In this case the latency is over a second.
+
+**The best case**
+
+At the time the signal is generated the program has collected half a window, so from then on, the signal is taken into account. The program then computes the average and sends it through MQTT, achieving potentially a latency of under a second.
+
+#### Network latency
+
+```shell
+[emanuele@Tesla iot-algo-assignment]$ ping 192.168.1.18
+PING 192.168.1.18 (192.168.1.18) 56(84) bytes of data.
+64 bytes from 192.168.1.18: icmp_seq=1 ttl=64 time=363 ms
+64 bytes from 192.168.1.18: icmp_seq=2 ttl=64 time=281 ms
+64 bytes from 192.168.1.18: icmp_seq=3 ttl=64 time=302 ms
+64 bytes from 192.168.1.18: icmp_seq=4 ttl=64 time=225 ms
+^C
+--- 192.168.1.18 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3001ms
+rtt min/avg/max/mdev = 225.446/292.858/363.361/49.343 ms
+```
+
+A part of the end-to-end latency is related to the network, has WiFi has a very high latency typically. In this example, an average of 292 ms.
