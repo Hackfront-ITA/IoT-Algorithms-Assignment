@@ -11,6 +11,7 @@
 
 #include "adapt.h"
 #include "adc.h"
+#include "config.h"
 #include "fft.h"
 #include "mqtt.h"
 #include "network.h"
@@ -96,7 +97,7 @@ void app_main(void) {
 			char buffer[16];
 			snprintf(buffer, sizeof(buffer), "%.05f", average);
 
-			ESP_ERROR_CHECK(a_mqtt_publish("/tests/esp32/average", buffer));
+			ESP_ERROR_CHECK(a_mqtt_publish(MQTT_BASE_TOPIC "/average", buffer));
 		}
 	}
 

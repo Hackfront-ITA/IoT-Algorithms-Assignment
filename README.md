@@ -37,6 +37,7 @@ Copy `main/config.sample.h` to `main/config.h` and edit it according to your pre
 #define NET_WIFI_PASSWORD   "<wifi password>"
 
 #define MQTT_BROKER_URL  "mqtts://<hostname>:8883"
+#define MQTT_BASE_TOPIC  "/tests/esp32"
 ```
 
 Also copy the MQTT broker certificate to `res/mqtt_cert.pem`.

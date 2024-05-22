@@ -64,7 +64,7 @@ static void a_mqtt_on_connect(void *handler_args, esp_event_base_t base, int32_t
 
 	a_mqtt_connected = true;
 
-	int msg_id = esp_mqtt_client_publish(a_client, "/tests/esp32/status", "ALIVE", 0, 0, true);
+	int msg_id = esp_mqtt_client_publish(a_client, MQTT_BASE_TOPIC "/status", "ALIVE", 0, 0, true);
 	ESP_LOGI(TAG, "Sent alive message, msg_id=%d", msg_id);
 };
 
