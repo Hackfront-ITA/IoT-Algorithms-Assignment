@@ -18,7 +18,8 @@
 #include "utils.h"
 
 #define A_DO_ADAPTATION        1
-#define A_START_SAMPLING_FREQ  (2 * 1000)
+#define A_FIXED_SAMPLING_FREQ  (2 * 1000)
+
 #define A_WINDOW_LEN           1000
 
 static const char *TAG = "App main";
@@ -43,7 +44,7 @@ void app_main(void) {
 	}
 	ESP_LOGW(TAG, "Sensed sampling frequency: %.02f Hz", sampling_freq);
 #else
-	sampling_freq = A_START_SAMPLING_FREQ;
+	sampling_freq = A_FIXED_SAMPLING_FREQ;
 	ESP_LOGW(TAG, "Fixed sampling frequency: %.02f Hz", sampling_freq);
 #endif
 
